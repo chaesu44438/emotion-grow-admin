@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      AdminRole @default(ADMIN)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("admins")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model User {
+  id              String    @id @default(uuid())
+  firebaseUid     String    @unique @map("firebase_uid")
+  email           String?
+  displayName     String?   @map("display_name")
+  provider        String?
+  subscriptionTier SubscriptionTier @default(FREE) @map("subscription_tier")
+  isActive        Boolean   @default(true) @map("is_active")
+  lastLoginAt     DateTime? @map("last_login_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  children       Child[]
+  emotionRecords EmotionRecord[]
+  stories        Story[]
+  aiUsageLogs    AiUsageLog[]
+  subscriptions  Subscription[]
+  @@map("users")
+}
+
+enum SubscriptionTier {
+  FREE
+  BASIC
+  PREMIUM
+}
+
+model Child {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  name        String
+  birthDate   DateTime? @map("birth_date")
+  gender      String?
+  ageGroup    String?  @map("age_group")
+  createdAt   DateTime @default(now()) @map("created_at")
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emotionRecords EmotionRecord[]
+  stories        Story[]
+  @@map("children")
+}
+
+model EmotionRecord {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  childId   String?  @map("child_id")
+  emotion   String
+  intensity Int      @default(3)
+  note      String?
+  context   String?
+  createdAt DateTime @default(now()) @map("created_at")
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  child Child? @relation(fields: [childId], references: [id], onDelete: SetNull)
+  @@index([userId, createdAt])
+  @@index([emotion])
+  @@map("emotion_records")
+}
+
+model Story {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  childId         String?  @map("child_id")
+  title           String
+  content         String?
+  emotion         String?
+  narrativeType   String?  @map("narrative_type")
+  illustrationCount Int    @default(0) @map("illustration_count")
+  ttsGenerated    Boolean  @default(false) @map("tts_generated")
+  status          StoryStatus @default(COMPLETED)
+  createdAt       DateTime @default(now()) @map("created_at")
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  child Child? @relation(fields: [childId], references: [id], onDelete: SetNull)
+  @@index([userId, createdAt])
+  @@map("stories")
+}
+
+enum StoryStatus {
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+model AiUsageLog {
+  id          String      @id @default(uuid())
+  userId      String      @map("user_id")
+  service     AiService
+  action      String
+  model       String?
+  inputTokens Int?        @map("input_tokens")
+  outputTokens Int?       @map("output_tokens")
+  cost        Decimal?    @db.Decimal(10, 6)
+  status      String      @default("success")
+  errorMessage String?    @map("error_message")
+  responseTime Int?       @map("response_time")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, createdAt])
+  @@index([service, createdAt])
+  @@index([createdAt])
+  @@map("ai_usage_logs")
+}
+
+enum AiService {
+  OPENAI_CHAT
+  OPENAI_TTS
+  GOOGLE_TTS
+  RECRAFT
+}
+
+model Subscription {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  tier      SubscriptionTier
+  startDate DateTime         @map("start_date")
+  endDate   DateTime?        @map("end_date")
+  amount    Int?
+  status    SubscriptionStatus @default(ACTIVE)
+  createdAt DateTime         @default(now()) @map("created_at")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, status])
+  @@map("subscriptions")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+model ErrorLog {
+  id        String   @id @default(uuid())
+  level     String   @default("ERROR")
+  source    String
+  message   String
+  stack     String?
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([level, createdAt])
+  @@map("error_logs")
+}
