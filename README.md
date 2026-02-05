@@ -94,7 +94,7 @@ API 호출 및 비용 모니터링
 ![동화 관리](docs/screenshots/stories.png)
 
 ### AI 사용량
-![AI 사용량](docs/screenshots/ai-usage.png)
+![AI 사용량](docs/screenshots/aiusage.png)
 
 <br/>
 
