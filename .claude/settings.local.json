@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(psql:*)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(set PGPASSWORD=post1234:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: 감정키움 관리자 대시보드 초기 구현\n\n- 프로젝트 구조: 모노레포 \\(client/server\\)\n- Client: React 18 + TypeScript + Vite + Tailwind CSS\n- Server: Express + TypeScript + Prisma + PostgreSQL\n\n주요 기능:\n- 로그인/인증 \\(JWT\\)\n- 대시보드: 통계 카드, 차트 \\(사용자/구독/감정 분포\\)\n- 사용자 관리: CRUD, 필터, 구독 변경, 휴면/정지 처리, 메모\n- 동화 관리: 필터, 통계, 상세 모달\n- AI 사용량: 일별/서비스별 차트, 월간 요약\n\nUI 컴포넌트:\n- Toast 알림, ConfirmDialog, Modal\n- 반응형 사이드바, 알림 드롭다운\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}

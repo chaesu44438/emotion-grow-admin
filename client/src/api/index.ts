@@ -1,82 +1,159 @@
-import axios from 'axios'
+// Portfolio Demo Mode - Using Mock Data
+import {
+  mockUsers,
+  mockStories,
+  mockDashboardStats,
+  mockUserGrowthChart,
+  mockAiUsageChart,
+  mockSubscriptionStats,
+  mockEmotionStats,
+  mockRecentActivities,
+  mockUserStats,
+  mockStoryStats,
+  mockAiUsageStats,
+  mockCostByService,
+  mockDailyCost,
+  mockMonthlySummary,
+  mockDailyCalls,
+  mockAiUsageLogs,
+  getUserDetailMock,
+  getStoryDetailMock,
+  mockAdmin,
+} from './mockData'
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+// Helper to simulate API response
+const mockResponse = <T>(data: T) => Promise.resolve({ data })
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+// Auth (not needed in demo mode, but kept for reference)
+export const login = (_email: string, _password: string) =>
+  mockResponse({ token: 'demo-token', admin: mockAdmin })
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  }
-)
-
-export default api
-
-// Auth
-export const login = (email: string, password: string) =>
-  api.post('/auth/login', { email, password })
-
-export const getMe = () => api.get('/auth/me')
+export const getMe = () => mockResponse(mockAdmin)
 
 // Dashboard
-export const getDashboardStats = () => api.get('/dashboard/stats')
-export const getUserGrowthChart = (days?: number) =>
-  api.get('/dashboard/user-growth', { params: { days } })
-export const getAiUsageChart = (days?: number) =>
-  api.get('/dashboard/ai-usage-chart', { params: { days } })
-export const getSubscriptionStats = () => api.get('/dashboard/subscription-stats')
-export const getEmotionStats = () => api.get('/dashboard/emotion-stats')
-export const getRecentActivities = (limit?: number) =>
-  api.get('/dashboard/recent-activities', { params: { limit } })
+export const getDashboardStats = () => mockResponse(mockDashboardStats)
+export const getUserGrowthChart = (_days?: number) => mockResponse(mockUserGrowthChart)
+export const getAiUsageChart = (_days?: number) => mockResponse(mockAiUsageChart)
+export const getSubscriptionStats = () => mockResponse(mockSubscriptionStats)
+export const getEmotionStats = () => mockResponse(mockEmotionStats)
+export const getRecentActivities = (_limit?: number) => mockResponse(mockRecentActivities)
 
 // Users
-export const getUserStats = () => api.get('/users/stats')
+export const getUserStats = () => mockResponse(mockUserStats)
 export const getUsers = (params?: {
   page?: number
   limit?: number
   search?: string
   tier?: string
   active?: string
-}) => api.get('/users', { params })
-export const getUser = (id: string) => api.get(`/users/${id}`)
-export const getUserDetail = (id: string) => api.get(`/users/${id}/detail`)
-export const updateUser = (id: string, data: Partial<{ isActive: boolean; subscriptionTier: string }>) =>
-  api.patch(`/users/${id}`, data)
+}) => {
+  let filtered = [...mockUsers]
+
+  // Filter by tier
+  if (params?.tier && params.tier !== 'ALL') {
+    filtered = filtered.filter(u => u.subscriptionTier === params.tier)
+  }
+
+  // Filter by active status
+  if (params?.active === 'true') {
+    filtered = filtered.filter(u => u.isActive)
+  } else if (params?.active === 'false') {
+    filtered = filtered.filter(u => !u.isActive)
+  }
+
+  // Search
+  if (params?.search) {
+    const search = params.search.toLowerCase()
+    filtered = filtered.filter(u =>
+      u.displayName?.toLowerCase().includes(search) ||
+      u.email?.toLowerCase().includes(search)
+    )
+  }
+
+  // Pagination
+  const page = params?.page || 1
+  const limit = params?.limit || 10
+  const start = (page - 1) * limit
+  const paged = filtered.slice(start, start + limit)
+
+  return mockResponse({ users: paged, total: filtered.length })
+}
+
+export const getUser = (id: string) => {
+  const user = mockUsers.find(u => u.id === id)
+  return mockResponse(user)
+}
+
+export const getUserDetail = (id: string) => {
+  const detail = getUserDetailMock(id)
+  return mockResponse(detail)
+}
+
+export const updateUser = (id: string, _data: Partial<{ isActive: boolean; subscriptionTier: string }>) => {
+  const user = mockUsers.find(u => u.id === id)
+  return mockResponse(user)
+}
 
 // AI Usage
-export const getAiUsageLogs = (params?: { page?: number; limit?: number; service?: string }) =>
-  api.get('/ai-usage', { params })
-export const getAiUsageStats = () => api.get('/ai-usage/stats')
-export const getCostByService = () => api.get('/ai-usage/cost-by-service')
-export const getDailyCost = (days?: number) =>
-  api.get('/ai-usage/daily-cost', { params: { days } })
-export const getMonthlySummary = () => api.get('/ai-usage/monthly-summary')
-export const getDailyCalls = (days?: number) =>
-  api.get('/ai-usage/daily-calls', { params: { days } })
+export const getAiUsageLogs = (params?: { page?: number; limit?: number; service?: string }) => {
+  let filtered = [...mockAiUsageLogs]
+
+  // Filter by service
+  if (params?.service && params.service !== 'ALL') {
+    filtered = filtered.filter(log => log.service === params.service)
+  }
+
+  // Pagination
+  const page = params?.page || 1
+  const limit = params?.limit || 10
+  const start = (page - 1) * limit
+  const paged = filtered.slice(start, start + limit)
+
+  return mockResponse({ logs: paged, total: filtered.length })
+}
+
+export const getAiUsageStats = () => mockResponse(mockAiUsageStats)
+export const getCostByService = () => mockResponse(mockCostByService)
+export const getDailyCost = (_days?: number) => mockResponse(mockDailyCost)
+export const getMonthlySummary = () => mockResponse(mockMonthlySummary)
+export const getDailyCalls = (_days?: number) => mockResponse(mockDailyCalls)
 
 // Stories
-export const getStoryStats = () => api.get('/stories/stats')
+export const getStoryStats = () => mockResponse(mockStoryStats)
 export const getStories = (params?: {
   page?: number
   limit?: number
   status?: string
   emotion?: string
   narrativeType?: string
-}) => api.get('/stories', { params })
-export const getStory = (id: string) => api.get(`/stories/${id}`)
+}) => {
+  let filtered = [...mockStories]
+
+  // Filter by status
+  if (params?.status && params.status !== 'ALL') {
+    filtered = filtered.filter(s => s.status === params.status)
+  }
+
+  // Filter by emotion
+  if (params?.emotion && params.emotion !== 'ALL') {
+    filtered = filtered.filter(s => s.emotion === params.emotion)
+  }
+
+  // Filter by narrative type
+  if (params?.narrativeType && params.narrativeType !== 'ALL') {
+    filtered = filtered.filter(s => s.narrativeType === params.narrativeType)
+  }
+
+  // Pagination
+  const page = params?.page || 1
+  const limit = params?.limit || 10
+  const start = (page - 1) * limit
+  const paged = filtered.slice(start, start + limit)
+
+  return mockResponse({ stories: paged, total: filtered.length })
+}
+
+export const getStory = (id: string) => {
+  const detail = getStoryDetailMock(id)
+  return mockResponse(detail)
+}

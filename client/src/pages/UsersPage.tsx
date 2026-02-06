@@ -198,11 +198,19 @@ export default function UsersPage() {
     setModalLoading(true)
     try {
       const res = await getUserDetail(userId)
+      if (!res.data) {
+        console.error('User not found')
+        return
+      }
       // 목록에서 현재 정지 상태 가져오기
       const existingUser = users.find(u => u.id === userId)
       // Add mock management fields
       const userDetail: UserDetail = {
         ...res.data,
+        children: res.data.children || [],
+        recentEmotions: res.data.recentEmotions || [],
+        recentStories: res.data.recentStories || [],
+        aiUsage: res.data.aiUsage || { totalCalls: 0, totalCost: 0 },
         isSuspended: existingUser?.isSuspended || false,
         suspendedUntil: null,
         suspendReason: existingUser?.isSuspended ? '이용약관 위반' : null, // 더미 사유
