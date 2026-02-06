@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from './components/layout'
 import {
@@ -9,43 +9,29 @@ import {
   AiUsagePage,
 } from './pages'
 import { ToastProvider } from './components/ui'
-import { getMe } from './api'
 import type { Admin } from './types'
 
+// 포트폴리오용 더미 관리자 (로그인 우회)
+const DEMO_ADMIN: Admin = {
+  id: 'demo-admin',
+  email: 'admin@emotiongrow.com',
+  name: '관리자',
+  role: 'SUPER_ADMIN',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+}
+
 function App() {
-  const [admin, setAdmin] = useState<Admin | null>(null)
-  const [loading, setLoading] = useState(true)
+  // 포트폴리오용: 항상 로그인된 상태로 시작
+  const [admin, setAdmin] = useState<Admin | null>(DEMO_ADMIN)
 
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      getMe()
-        .then((res) => setAdmin(res.data))
-        .catch(() => {
-          localStorage.removeItem('token')
-        })
-        .finally(() => setLoading(false))
-    } else {
-      setLoading(false)
-    }
-  }, [])
-
-  const handleLogin = (token: string, adminData: Admin) => {
-    localStorage.setItem('token', token)
+  const handleLogin = (_token: string, adminData: Admin) => {
     setAdmin(adminData)
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    setAdmin(null)
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    )
+    // 포트폴리오용: 로그아웃해도 데모 관리자로 유지
+    setAdmin(DEMO_ADMIN)
   }
 
   return (
