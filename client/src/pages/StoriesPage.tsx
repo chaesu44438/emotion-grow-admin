@@ -32,13 +32,13 @@ interface StoryStats {
   narrativeDistribution: Array<{ type: string; count: number }>
 }
 
-interface StoryDetail extends Story {
+interface StoryDetail extends Omit<Story, 'child'> {
   child: {
     id: string
     name: string
     ageGroup: string | null
     gender: string | null
-  } | null
+  } | undefined
 }
 
 const STATUS_FILTERS = [
@@ -318,7 +318,7 @@ export default function StoriesPage() {
                   </TableHead>
                   <TableBody>
                     {stories.map((story, idx) => (
-                      <TableRow
+                      <tr
                         key={story.id}
                         className={`cursor-pointer hover:bg-gray-50 ${idx % 2 === 1 ? 'bg-gray-50/50' : ''}`}
                         onClick={() => handleStoryClick(story.id)}
@@ -359,7 +359,7 @@ export default function StoriesPage() {
                         <TableCell className="text-gray-500 text-sm">
                           {new Date(story.createdAt).toLocaleDateString('ko-KR')}
                         </TableCell>
-                      </TableRow>
+                      </tr>
                     ))}
                   </TableBody>
                 </Table>

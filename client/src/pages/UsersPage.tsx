@@ -239,7 +239,7 @@ export default function UsersPage() {
     // Update local state
     setSelectedUser(prev => prev ? {
       ...prev,
-      subscriptionTier: newTier,
+      subscriptionTier: newTier as 'FREE' | 'BASIC' | 'PREMIUM',
       changeLogs: [
         { id: Date.now().toString(), action: `${oldTier} → ${newTier} (관리자)`, createdAt: new Date().toISOString().split('T')[0] },
         ...(prev.changeLogs || [])
@@ -247,7 +247,7 @@ export default function UsersPage() {
     } : null)
 
     // Update users list
-    setUsers(prev => prev.map(u => u.id === selectedUser.id ? { ...u, subscriptionTier: newTier } : u))
+    setUsers(prev => prev.map(u => u.id === selectedUser.id ? { ...u, subscriptionTier: newTier as 'FREE' | 'BASIC' | 'PREMIUM' } : u))
 
     showToast('success', '구독 등급이 변경되었습니다')
     setTierChangeDialog({ open: false, newTier: '' })
@@ -494,8 +494,8 @@ export default function UsersPage() {
                         key={user.id}
                         className={`hover:bg-gray-50 ${user.isSuspended ? 'bg-orange-50/50' : idx % 2 === 1 ? 'bg-gray-50/50' : ''}`}
                       >
-                        <TableCell
-                          className="cursor-pointer"
+                        <td
+                          className="px-6 py-4 cursor-pointer"
                           onClick={() => handleUserClick(user.id, 'view')}
                         >
                           <div>
@@ -504,7 +504,7 @@ export default function UsersPage() {
                             </p>
                             <p className="text-gray-500 text-xs">{user.email || 'N/A'}</p>
                           </div>
-                        </TableCell>
+                        </td>
                         <TableCell>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${TIER_STYLES[user.subscriptionTier]}`}>
                             {user.subscriptionTier}

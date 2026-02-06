@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Users, BookOpen, Heart, Brain, TrendingUp, TrendingDown, UserPlus, Sparkles, CreditCard } from 'lucide-react'
+import { Users, BookOpen, Heart, TrendingUp, TrendingDown, UserPlus, Sparkles, CreditCard } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '../components/ui'
 import {
   getDashboardStats,
@@ -22,7 +22,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
 } from 'recharts'
 
 // Types
