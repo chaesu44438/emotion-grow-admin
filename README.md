@@ -4,6 +4,14 @@
 
 <br/>
 
+## 🌐 Live Demo
+
+**https://emotion-grow-admin.vercel.app**
+
+> 로그인 없이 바로 대시보드를 확인할 수 있습니다 (포트폴리오용 데모 모드)
+
+<br/>
+
 ## 🛠 기술 스택
 
 ### Frontend
@@ -49,6 +57,7 @@
 ### 📊 대시보드
 핵심 지표를 한눈에 파악할 수 있는 메인 화면
 - 총 사용자 수, 오늘 생성된 동화, 이번 달 AI 비용
+- 사용자 증가 추이 (라인 차트)
 - 구독 티어별 사용자 분포 (파이 차트)
 - 감정 분포 현황 (바 차트)
 - 최근 활동 피드
@@ -71,9 +80,11 @@ AI가 생성한 동화 콘텐츠 모니터링
 
 ### 📡 AI 사용량
 API 호출 및 비용 모니터링
-- 일별 API 호출량 추이 (라인 차트)
+- 서비스별 일별 비용 추이 (스택 영역 차트)
 - 서비스별 비용 분포 (파이 차트)
-- 월간 비용 요약
+- 서비스별 일별 호출량 (스택 바 차트)
+- API 호출 로그 테이블
+- 월간 비용 요약 및 예상 비용
 
 ### 🔔 알림 시스템
 운영 이슈를 실시간으로 파악
@@ -158,7 +169,7 @@ npm run dev    # http://localhost:4000
 
 # 클라이언트 (터미널 2)
 cd client
-npm run dev    # http://localhost:3000
+npm run dev    # http://localhost:5173
 ```
 
 ### 6. 로그인
@@ -202,6 +213,9 @@ emotion-grow-admin/
 │   │       ├── aiUsage.ts
 │   │       └── dashboard.ts
 │   └── tsconfig.json
+│
+├── docs/
+│   └── screenshots/            # 스크린샷 이미지
 │
 ├── .env.example
 └── README.md
